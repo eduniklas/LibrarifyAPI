@@ -19,7 +19,6 @@ namespace LibrarifyAPI.Models
         public decimal Amount { get; set; }
         [Required]
         public bool IsPaid { get; set; }
-        [Required]
         public DateTime IssueDate { get; set; }
     }
 }

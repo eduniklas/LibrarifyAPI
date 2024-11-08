@@ -19,7 +19,6 @@ namespace LibrarifyAPI.Models
         public int Rating { get; set; }
         [MaxLength(255)]
         public string Comment { get; set; }
-        [Required]
         public DateTime ReviewDate { get; set; }
     }
 }

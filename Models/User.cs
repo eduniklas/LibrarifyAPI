@@ -17,7 +17,6 @@ namespace LibrarifyAPI.Models
         public string LastName { get; set; }
         [Required, MinLength(4), MaxLength(50)]
         public string UserName { get; set; }
-        [Required]
         public DateTime DateJoined { get; set; }
         [Required]
         public bool IsAccountActive { get; set; }

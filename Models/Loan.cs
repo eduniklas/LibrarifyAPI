@@ -15,9 +15,7 @@ namespace LibrarifyAPI.Models
         public int BookId { get; set; }
         [ForeignKey("BookId")]
         public Book Book { get; set; }
-        [Required]
         public DateTime LoanDate { get; set; }
-        [Required]
         public DateTime DueDate { get; set; }
         public DateTime? ReturnDate { get; set; }
         [Required]

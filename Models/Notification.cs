@@ -13,7 +13,6 @@ namespace LibrarifyAPI.Models
         public User User { get; set; }
         [Required, MaxLength(255)]
         public string Message { get; set; }
-        [Required]
         public DateTime SentDate { get; set; }
         public bool IsRead { get; set; }
     }

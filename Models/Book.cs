@@ -23,6 +23,10 @@ namespace LibrarifyAPI.Models
         [Url]
         [MaxLength(200)]
         public string DigitalUrl { get; set; } // For digital or audiobook files
+        [Url]
+        [MaxLength(200)]
+        public string ImageUrl { get; set; }
+        
         public ICollection<Loan> Loans { get; set; }
         public ICollection<Review> Reviews { get; set; }
     }
