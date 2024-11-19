@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibrarifyAPI.Data;
 using LibrarifyAPI.Models;
+using LibrarifyAPI.Repository.IRepository;
 
 namespace LibrarifyAPI.Controllers
 {
@@ -15,24 +16,26 @@ namespace LibrarifyAPI.Controllers
     public class FeesController : ControllerBase
     {
         private readonly LibraryContext _context;
+        private readonly IRepository<Fee> _repository;
 
-        public FeesController(LibraryContext context)
+        public FeesController(LibraryContext context, IRepository<Fee> repository)
         {
             _context = context;
+            _repository = repository;
         }
 
         // GET: api/Fees
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Fee>>> GetFee()
         {
-            return await _context.Fee.ToListAsync();
+            return await _repository.GetListAsync();
         }
 
         // GET: api/Fees/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Fee>> GetFee(int id)
         {
-            var fee = await _context.Fee.FindAsync(id);
+            var fee = await _repository.GetByFilterAsync(x=>x.Id == id);
 
             if (fee == null)
             {
@@ -78,8 +81,7 @@ namespace LibrarifyAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Fee>> PostFee(Fee fee)
         {
-            _context.Fee.Add(fee);
-            await _context.SaveChangesAsync();
+            await _repository.CreateAsync(fee);
 
             return CreatedAtAction("GetFee", new { id = fee.Id }, fee);
         }

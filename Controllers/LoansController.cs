@@ -16,26 +16,24 @@ namespace LibrarifyAPI.Controllers
     public class LoansController : ControllerBase
     {
         private readonly LibraryContext _context;
-        private readonly ILoanRepository _loanRepository;
+        private readonly IRepository<Loan> _repository;
 
-        public LoansController(LibraryContext context, ILoanRepository loanRepository)
+        public LoansController(LibraryContext context, IRepository<Loan> loanRepository)
         {
             _context = context;
-            _loanRepository = loanRepository;
+            _repository = loanRepository;
         }
 
-        // GET: api/Loans
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Loan>>> GetLoans()
         {
-            return await _loanRepository.GetLoansList();
+            return await _repository.GetListAsync();
         }
 
-        // GET: api/Loans/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Loan>> GetLoan(int id)
         {
-            var loan = await _context.Loans.FindAsync(id);
+            var loan = await _repository.GetByFilterAsync(x=>x.Id == id);
 
             if (loan == null)
             {
@@ -45,8 +43,6 @@ namespace LibrarifyAPI.Controllers
             return loan;
         }
 
-        // PUT: api/Loans/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutLoan(int id, Loan loan)
         {
@@ -76,18 +72,15 @@ namespace LibrarifyAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/Loans
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Loan>> PostLoan(Loan loan)
         {
-            _context.Loans.Add(loan);
-            await _context.SaveChangesAsync();
+            
+            await _repository.CreateAsync(loan);
 
             return CreatedAtAction("GetLoan", new { id = loan.Id }, loan);
         }
 
-        // DELETE: api/Loans/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLoan(int id)
         {

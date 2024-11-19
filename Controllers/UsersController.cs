@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibrarifyAPI.Data;
 using LibrarifyAPI.Models;
+using LibrarifyAPI.Repository.IRepository;
 
 namespace LibrarifyAPI.Controllers
 {
@@ -15,24 +16,26 @@ namespace LibrarifyAPI.Controllers
     public class UsersController : ControllerBase
     {
         private readonly LibraryContext _context;
+        private readonly IRepository<User> _repository;
 
-        public UsersController(LibraryContext context)
+        public UsersController(LibraryContext context, IRepository<User> repository)
         {
             _context = context;
+            _repository = repository;
         }
 
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            return await _repository.GetListAsync();
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _repository.GetByFilterAsync(x=>x.Id == id);
 
             if (user == null)
             {
@@ -78,8 +81,7 @@ namespace LibrarifyAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            await _repository.CreateAsync(user);
 
             return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }

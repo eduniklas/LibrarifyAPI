@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibrarifyAPI.Data;
 using LibrarifyAPI.Models;
+using LibrarifyAPI.Repository.IRepository;
 
 namespace LibrarifyAPI.Controllers
 {
@@ -15,24 +16,26 @@ namespace LibrarifyAPI.Controllers
     public class ReviewsController : ControllerBase
     {
         private readonly LibraryContext _context;
+        private readonly IRepository<Review> _repository;
 
-        public ReviewsController(LibraryContext context)
+        public ReviewsController(LibraryContext context, IRepository<Review> repository)
         {
             _context = context;
+            _repository = repository;
         }
 
         // GET: api/Reviews
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Review>>> GetReviews()
         {
-            return await _context.Reviews.ToListAsync();
+            return await _repository.GetListAsync();
         }
 
         // GET: api/Reviews/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Review>> GetReview(int id)
         {
-            var review = await _context.Reviews.FindAsync(id);
+            var review = await _repository.GetByFilterAsync(x=>x.Id == id);
 
             if (review == null)
             {
@@ -78,8 +81,7 @@ namespace LibrarifyAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Review>> PostReview(Review review)
         {
-            _context.Reviews.Add(review);
-            await _context.SaveChangesAsync();
+            await _repository.CreateAsync(review);
 
             return CreatedAtAction("GetReview", new { id = review.Id }, review);
         }

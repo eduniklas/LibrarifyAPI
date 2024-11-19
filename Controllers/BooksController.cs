@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibrarifyAPI.Data;
 using LibrarifyAPI.Models;
+using LibrarifyAPI.Repository.IRepository;
 
 namespace LibrarifyAPI.Controllers
 {
@@ -15,24 +16,32 @@ namespace LibrarifyAPI.Controllers
     public class BooksController : ControllerBase
     {
         private readonly LibraryContext _context;
+        private readonly IRepository<Book> _repository;
 
-        public BooksController(LibraryContext context)
+        public BooksController(LibraryContext context, IRepository<Book> repository)
         {
             _context = context;
+            _repository = repository;
         }
 
         // GET: api/Books
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
         {
-            return await _context.Books.ToListAsync();
+            return await _repository.GetListAsync();
+        }
+        
+        [HttpGet("Search/{search}")]
+        public async Task<ActionResult<IEnumerable<Book>>> GetBooksByFilter(string search)
+        {
+            return await _repository.GetListAsync(x=>x.Title.Contains(search) || x.Author.Contains(search) || x.ISBN.Contains(search));
         }
 
         // GET: api/Books/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Book>> GetBook(int id)
         {
-            var book = await _context.Books.FindAsync(id);
+            var book = await _repository.GetByFilterAsync(x=>x.Id == id);
 
             if (book == null)
             {
@@ -78,8 +87,7 @@ namespace LibrarifyAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Book>> PostBook(Book book)
         {
-            _context.Books.Add(book);
-            await _context.SaveChangesAsync();
+            await _repository.CreateAsync(book);
 
             return CreatedAtAction("GetBook", new { id = book.Id }, book);
         }

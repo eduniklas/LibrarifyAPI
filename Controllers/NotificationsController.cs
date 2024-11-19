@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibrarifyAPI.Data;
 using LibrarifyAPI.Models;
+using LibrarifyAPI.Repository.IRepository;
 
 namespace LibrarifyAPI.Controllers
 {
@@ -15,24 +16,26 @@ namespace LibrarifyAPI.Controllers
     public class NotificationsController : ControllerBase
     {
         private readonly LibraryContext _context;
+        private readonly IRepository<Notification> _repository;
 
-        public NotificationsController(LibraryContext context)
+        public NotificationsController(LibraryContext context, IRepository<Notification> repository)
         {
             _context = context;
+            _repository = repository;
         }
 
         // GET: api/Notifications
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Notification>>> GetNotifications()
         {
-            return await _context.Notifications.ToListAsync();
+            return await _repository.GetListAsync();
         }
 
         // GET: api/Notifications/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Notification>> GetNotification(int id)
         {
-            var notification = await _context.Notifications.FindAsync(id);
+            var notification = await _repository.GetByFilterAsync(x=>x.Id == id);
 
             if (notification == null)
             {
@@ -78,8 +81,7 @@ namespace LibrarifyAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Notification>> PostNotification(Notification notification)
         {
-            _context.Notifications.Add(notification);
-            await _context.SaveChangesAsync();
+            await _repository.CreateAsync(notification);
 
             return CreatedAtAction("GetNotification", new { id = notification.Id }, notification);
         }
